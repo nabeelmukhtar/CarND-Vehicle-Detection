@@ -53,22 +53,21 @@ You're reading it!
 
 #### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The code for this step is contained in the first code cell of the IPython notebook (or in lines # through # of the file called `some_file.py`).  
+The code for this step is contained in the code cells #3 and #4 of the IPython notebook.
 
 I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
 
 ![alt text][image1]
 
-I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
+I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`). I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
 
 Here is an example using the `YCrCb` color space and HOG parameters of `orientations=9`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
-
 
 ![alt text][image2]
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+I tried various combinations of parameters in the classifier and settled for these parameters.
 
 ```python
 ### Tweak these parameters and see how the results change.
@@ -77,38 +76,41 @@ orient = 9  # HOG orientations
 pix_per_cell = 8 # HOG pixels per cell
 cell_per_block = 2 # HOG cells per block
 hog_channel = 'ALL' # Can be 0, 1, 2, or "ALL"
-spatial_size = (32, 32) # Spatial binning dimensions
-hist_bins = 32    # Number of histogram bins
-spatial_feat = True # Spatial features on or off
-hist_feat = True # Histogram features on or off
-hog_feat = True # HOG features on or off
 ```
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I used the extract_features methdo from the lessons as is. Since the image dataset was small, I decided to use all the three types of features (HOG, histogram and spatial). I also decided to use the YCrCb colorspace because it was giving the best results. For spatial and histogram features I used the default parammeters because they were already tweaked in the lessons.
-For HOG I chose ALL hog channels with 9 orientations. This is because selecting a single hog channel was not working for the classifier. I used a Linear SVM which is known to work well for HOG features. I scaled the features using StandardScaler and split 20% of data randomly into a test set. The statistics of he whole process are printed below:
+I used the extract_features methdo from the lessons as is in code cell #4. Since the image dataset was small, I decided to use all the three types of features (HOG, histogram and spatial). I also decided to use the YCrCb colorspace because it was giving the best results. For spatial and histogram features I used the default parammeters because they were already tweaked in the lessons.
+For HOG I chose ALL hog channels with 9 orientations. This is because selecting a single hog channel was not working for the classifier. I used a Linear SVM which is known to work well for HOG features. I scaled the features using StandardScaler and split 20% of data randomly into a test set. The code for the classifier is in cell #8 of the IPython notebook.
 
-    38.0 seconds to extract car features...
-    38.13 seconds to extract non-car features...
-    4.88 seconds to scale/transform features...
+The statistics of the whole process are printed below:
+
+    49.05 seconds to extract car features...
+    50.92 seconds to extract non-car features...
+    6.36 seconds to scale/transform features...
     Using: 9 orientations 8 pixels per cell and 2 cells per block
     Feature vector length: 8460
-    8.32 seconds to train Linear SVM...
-    Test Accuracy of SVC =  0.9879
+    31.16 seconds to train Linear SVM...
+    Test Accuracy of SVC =  0.9904
 
 ### Sliding Window Search
 
-#### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
+#### 1. Describe how (and identify where in your code) you implemented a sliding window search. How did you decide what scales to search and how much to overlap windows?
 
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
+For testing on images I used the sliding_window functions provided in the lessons. Its in cell #5 of the IPython notebook. 
+I used a single window size (96, 96), and an overlap of (0.75, 0.75),
+
+Here are the example outputs:
 
 ![alt text][image3a]
 ![alt text][image3b]
 
+However for actual video processing I used the find_cars method with a scale of 1.5 (also in cell #5) because it uses HOG subsampling search and is more efficient.
+
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
+I decided to use all the three types of features (HOG, histogram and spatial). I also decided to use the YCrCb colorspace because it was giving the best results. Here are the example images.
+
 ![png](output_10_0.png)
 
 ![alt text][image6a]
@@ -122,12 +124,18 @@ Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spat
 ### Video Implementation
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](../output_videos/project_video.mp4)
 
+Here's a [link to my video result](../output_videos/project_video.mp4)
+The code for my video processing pipeline is in code cell #10 of the IPython Notebook.
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
+* I created a queue of last 30 frames.
+* I recorded the positions of positive detections in each frame of the video using the find_cars method.
+* From the positive detections I created a heatmap and added it to a the queue.
+* I then thresholded that map to identify vehicle positions. I removed detections that do not occur in atleast 15 frames as false positives.
+* I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap. I then assumed each blob corresponded to a vehicle.
+* I constructed bounding boxes to cover the area of each blob detected.  
 
 Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
 
@@ -162,6 +170,5 @@ Here's an example result showing the heatmap from a series of frames of video, t
 
 The great thing about this project was that most of the code was already provided and explained in the lessons. Most of the code works as it is and the only challenging part is tuning the various parameters.
 The only change I made is in the find_cars function where instead of drawing rectangles on the image I am returning the list of bounding boxes similar to search_windows method so that we can add heat and apply thresholds to these bounding boxes as well.
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
-
+The other challenge was to eliminate false positives by keeping a queue of 30 frames.
+Currently I eliminate any detections that does not persist for 15 frames but that may varu from video to video and can fail in cases where a vehicle suddenly comes and goes.
