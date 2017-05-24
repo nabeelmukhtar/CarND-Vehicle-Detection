@@ -1,4 +1,5 @@
-# Vehicle Detection Project
+# Self-Driving Car Engineer Nanodegree
+## Vehicle Detection Project
 
 The goals / steps of this project are the following:
 
