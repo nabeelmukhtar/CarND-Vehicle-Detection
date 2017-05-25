@@ -1,5 +1,5 @@
 # Self-Driving Car Engineer Nanodegree
-## Vehicle Detection Project
+## Project: Vehicle Detection
 
 The goals / steps of this project are the following:
 
@@ -10,15 +10,10 @@ The goals / steps of this project are the following:
 * Run your pipeline on a video stream (start with the test_video.mp4 and later implement on full project_video.mp4) and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles.
 * Estimate a bounding box for vehicles detected.
 
-[//]: # (Image References)
 [image1]: ./output_images/car_not_car.png
 [image2]: ./output_images/HOG_example.png
 [image3a]: ./output_images/sliding-windows/test1.jpg
 [image3b]: ./output_images/sliding-windows/test2.jpg
-[image3c]: ./output_images/sliding-windows/test3.jpg
-[image3d]: ./output_images/sliding-windows/test4.jpg
-[image3e]: ./output_images/sliding-windows/test5.jpg
-[image3f]: ./output_images/sliding-windows/test6.jpg
 [image4a]: ./output_images/candidate-windows/test1.jpg
 [image4b]: ./output_images/candidate-windows/test2.jpg
 [image4c]: ./output_images/candidate-windows/test3.jpg
@@ -37,18 +32,6 @@ The goals / steps of this project are the following:
 [image6d]: ./output_images/detected-cars/test4.jpg
 [image6e]: ./output_images/detected-cars/test5.jpg
 [image6f]: ./output_images/detected-cars/test6.jpg
-[image6]: ./output_images/labels_map.png
-[image7]: ./output_images/output_bboxes.png
-[video1]: ./output_videos/project_video.mp4
-
-## [Rubric Points](https://review.udacity.com/#!/rubrics/513/view)
-### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
-
-### Writeup / README
-
-#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Vehicle-Detection/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
-
-You're reading it! I have followed the same template.
 
 ### Histogram of Oriented Gradients (HOG)
 
